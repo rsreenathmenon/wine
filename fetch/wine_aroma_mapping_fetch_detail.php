@@ -4,6 +4,7 @@ include_once('../custom/globals-without-login.php');
 
 
 $REF = $_REQUEST['ref'];
+$WINESTYLE_REF = $_REQUEST['winestyle_ref'];
 
 $PAGE = ($_REQUEST['p']) ? $_REQUEST['p'] : 1;
 $ROWS_PER_PAGE = ($_REQUEST['r']) ? $_REQUEST['r'] :ROWS_PER_PAGE;
@@ -22,7 +23,7 @@ function wine_fetch_getdata()
 	/* //////////////////////////////// */
 
 	global $PDO,$PDO_WRITE;
-	global $REF, $PAGE, $ROWS_PER_PAGE, $SORTING_FIELD, $SORT_ORDER;
+	global $REF, $PAGE, $ROWS_PER_PAGE, $SORTING_FIELD, $SORT_ORDER, $WINESTYLE_REF;
 	global $SHOW_FILTER, $PAGE_COUNT;
 
 	$STARTING_LIMIT = ($PAGE - 1) * $ROWS_PER_PAGE;
@@ -36,18 +37,22 @@ function wine_fetch_getdata()
 	try 
 	{
 		$query = 	"SELECT 
-						branch_ref,
-						branch_name,
-						branch_code
+						winearoma_ref,
+						winearoma_name
 				 	FROM 
-						branch
+						winearoma
 				 	WHERE 
-				 		branch_status_id = :branch_status_id
+				 		winearoma_status_id = :winearoma_status_id
+						AND
+						winearoma_winestyle_ref = :winearoma_winestyle_ref
 					ORDER BY 
-						branch_name ASC";
+						winearoma_name ASC";
 		$sth = $PDO->prepare($query, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 		$temp_array = array();
-		$pdo_fieldvalue = array(':branch_status_id' => '1');
+		$pdo_fieldvalue = array(
+			':winearoma_status_id' => '1',
+			':winearoma_winestyle_ref' => $WINESTYLE_REF
+		);
 
 		if($sth->execute($pdo_fieldvalue))
 		{
@@ -63,154 +68,7 @@ function wine_fetch_getdata()
 				}
 				$temp_array[] = $row;
 			}
-			$RETURN['branch'] = $temp_array;
-
-		}
-	}
-	catch(PDOException $e)
-	{
-		//echo "Error: " . __LINE__. $e->getMessage();
-		$RETURN['error'] = "Error: " . __LINE__. $e->getMessage();
-	}
-	
-	try 
-	{
-		$query = 	"SELECT 
-						country_ref,
-						country_name
-				 	FROM 
-						country
-				 	WHERE 
-				 		country_status_id = :country_status_id
-					ORDER BY 
-						country_name ASC";
-		$sth = $PDO->prepare($query, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-		$temp_array = array();
-		$pdo_fieldvalue = array(':country_status_id' => '1');
-
-		if($sth->execute($pdo_fieldvalue))
-		{
-			while($row = $sth->fetch(PDO::FETCH_ASSOC))
-			{
-				foreach ($row as $key => $value) 
-				{
-					$row[$key] =  stripslashes($value);
-				}
-				foreach ($row as $key => $value) 
-				{
-					$row[$key] = strip_tags($value, '<p><font><span><div><ul><li><br><table><thead><tbody><th><tr><td>');
-				}
-				$temp_array[] = $row;
-			}
-			$RETURN['country'] = $temp_array;
-
-		}
-	}
-	catch(PDOException $e)
-	{
-		//echo "Error: " . __LINE__. $e->getMessage();
-		$RETURN['error'] = "Error: " . __LINE__. $e->getMessage();
-	}
-	
-	try 
-	{
-		$query = 	"SELECT 
-						varietal_ref,
-						varietal_name
-				 	FROM 
-						varietal
-				 	WHERE 
-				 		varietal_status_id = :varietal_status_id
-					ORDER BY 
-						varietal_name ASC";
-		$sth = $PDO->prepare($query, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-		$temp_array = array();
-		$pdo_fieldvalue = array(':varietal_status_id' => '1');
-
-		if($sth->execute($pdo_fieldvalue))
-		{
-			while($row = $sth->fetch(PDO::FETCH_ASSOC))
-			{
-				foreach ($row as $key => $value) 
-				{
-					$row[$key] =  stripslashes($value);
-				}
-				foreach ($row as $key => $value) 
-				{
-					$row[$key] = strip_tags($value, '<p><font><span><div><ul><li><br><table><thead><tbody><th><tr><td>');
-				}
-				$temp_array[] = $row;
-			}
-			$RETURN['varietal'] = $temp_array;
-
-		}
-	}
-	catch(PDOException $e)
-	{
-		//echo "Error: " . __LINE__. $e->getMessage();
-		$RETURN['error'] = "Error: " . __LINE__. $e->getMessage();
-	}
-	
-	try 
-	{
-		$query = 	"SELECT 
-						winery_ref,
-						winery_name
-				 	FROM 
-						winery
-				 	WHERE 
-				 		winery_status_id = :winery_status_id
-					ORDER BY 
-						winery_name ASC";
-		$sth = $PDO->prepare($query, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-		$temp_array = array();
-		$pdo_fieldvalue = array(':winery_status_id' => '1');
-
-		if($sth->execute($pdo_fieldvalue))
-		{
-			while($row = $sth->fetch(PDO::FETCH_ASSOC))
-			{
-				foreach ($row as $key => $value) 
-				{
-					$row[$key] =  stripslashes($value);
-				}
-				foreach ($row as $key => $value) 
-				{
-					$row[$key] = strip_tags($value, '<p><font><span><div><ul><li><br><table><thead><tbody><th><tr><td>');
-				}
-				$temp_array[] = $row;
-			}
-			$RETURN['winery'] = $temp_array;
-
-		}
-	}
-	catch(PDOException $e)
-	{
-		//echo "Error: " . __LINE__. $e->getMessage();
-		$RETURN['error'] = "Error: " . __LINE__. $e->getMessage();
-	}
-	
-	try 
-	{
-		$query = 	"SELECT 
-						winevarientalmap_variental_ref 
-				 	FROM 
-						winevarientalmap
-				 	WHERE 
-				 		winevarientalmap_wine_ref  = :winevarientalmap_wine_ref
-				 		AND
-				 		winevarientalmap_status_id  = '1'";
-		$sth = $PDO->prepare($query, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-		$temp_array = array();
-		$pdo_fieldvalue = array(':winevarientalmap_wine_ref' => $REF);
-
-		if($sth->execute($pdo_fieldvalue))
-		{
-			while($row = $sth->fetch(PDO::FETCH_ASSOC))
-			{
-				$temp_array[] = $row['winevarientalmap_variental_ref'];
-			}
-			$RETURN['winevarientalmap'] = $temp_array;
+			$RETURN['winearoma'] = $temp_array;
 
 		}
 	}
@@ -229,11 +87,16 @@ function wine_fetch_getdata()
 						winestyle
 				 	WHERE 
 				 		winestyle_status_id = :winestyle_status_id
+						AND
+				 		winestyle_ref = :winestyle_ref
 					ORDER BY 
 						winestyle_name ASC";
 		$sth = $PDO->prepare($query, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 		$temp_array = array();
-		$pdo_fieldvalue = array(':winestyle_status_id' => '1');
+		$pdo_fieldvalue = array(
+			':winestyle_status_id' => '1',
+			':winestyle_ref' => $WINESTYLE_REF
+		);
 
 		if($sth->execute($pdo_fieldvalue))
 		{
@@ -259,6 +122,35 @@ function wine_fetch_getdata()
 		$RETURN['error'] = "Error: " . __LINE__. $e->getMessage();
 	}
 	
+	try 
+	{
+		$query = 	"SELECT 
+						winearomamap.*
+				 	FROM 
+						winearomamap
+				 	WHERE 
+				 		winearomamap_wine_ref  = :winearomamap_wine_ref
+				 		AND
+				 		winearomamap_status_id  = '1'";
+		$sth = $PDO->prepare($query, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		$temp_array = array();
+		$pdo_fieldvalue = array(':winearomamap_wine_ref' => $REF);
+
+		if($sth->execute($pdo_fieldvalue))
+		{
+			$RETURN['winearomamap'] = $row;
+
+		}
+	}
+	catch(PDOException $e)
+	{
+		//echo "Error: " . __LINE__. $e->getMessage();
+		$RETURN['error'] = "Error: " . __LINE__. $e->getMessage();
+	}
+	
+	/**
+	 * Needed for top menu so don't delete
+	 */
 	try 
 	{
 		$query = 	"SELECT 

@@ -54,6 +54,49 @@ include_once("layout/aside.php");
     <section class="content">
       <div class="container-fluid">
         <div class="row">
+
+          <!-- Customer Menu -->
+          <div class="col-md-12">
+            <div class="card card-primary card-outline">
+              <div class="card-body">
+                <ul class="nav nav-tabs" id="custom-content-below-tab" role="tablist">
+                  <li class="nav-item">
+                    <a class="nav-link" href="wine_view.php?ref=<?php echo $wine_ref;?>" role="tab">View</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link nav-link-active" href="wine_edit.php?ref=<?php echo $wine_ref;?>" role="tab">Edit</a>
+                  </li>
+                  <?php
+
+                    $data_table_winestyle = $response_data->winestyle_topmenu;
+
+                    for($ij=0; $ij<count($data_table_winestyle); $ij++)
+                    {
+                      $data_row_winestyle = (array) $data_table_winestyle[$ij];
+                      extract($data_row_winestyle);
+
+                      $classSelection = "";
+                      if($winestyle_ref==$wine_winestyle_ref)
+                      {
+                        $classSelection .= "nav-link-active";
+                      }
+
+                      ?>
+                      <li class="nav-item">
+                        <a class="nav-link <?php echo $classSelection;?>" href="wine_aroma_mapping.php?ref=<?php echo $wine_ref;?>&winestyle_ref=<?php echo $winestyle_ref;?>" role="tab"><?php echo $winestyle_name;?></a>
+                      </li>
+                      <?php
+                    }
+
+                  ?>
+                </ul>
+              </div>
+              <!-- /.card -->
+            </div>
+            <!-- /.card -->
+          </div>
+
+
           <div class="col-md-12">
 
             <form action="process/wine_process.php" method="post" >
@@ -322,4 +365,5 @@ include_once("layout/bottom-footer.php");
     custom_js_country_region_dropdown(FieldID,CountryRef,OptionToSelect);
   }
   js_wine_edit_country_change();
+  custom_js_cust_nav_bar_selection("nav-link-active");
 </script>
